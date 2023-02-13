@@ -1,0 +1,4 @@
+{
+    "sshUser": "pi",
+    "sshEndpoint": "raspberrypi.local"
+}
