@@ -44,11 +44,12 @@ def send_message(stream, lock, message):
 port = "/dev/serial0"
 baudrate = 9600
 timeout = 0.1
+serial_lock = Lock()
 #serial = Serial(port, baudrate, timeout=timeout)
-if 1:
+def gps_mode():
       model = 0
       serial = Serial(port, baudrate, timeout=timeout)
-      #global prev_read  #, serial
+      global prev_read, serial_lock
       #try:
       msg = UBXMessage("CFG", "CFG-NAV5", SET, msgClass=0x06, msgID=0x24, fixMode=2, dyn=1, dynModel=0x06)
       print(msg)
@@ -58,11 +59,11 @@ if 1:
 
       print("\nStarting read thread...\n")
       reading = True
-      serial_lock = Lock()
+      #serial_lock = Lock()
       read_thread = start_thread(serial, serial_lock, ubr)
       sleep(1)
       while model != 6:
-       try:
+        #try:
         send_message(serial, serial_lock, msg)
         sleep(1)
         msg = UBXMessage("CFG", "CFG-NAV5", POLL)
@@ -71,10 +72,11 @@ if 1:
         print(prev_read)
         model = int(str(prev_read).split(",")[11].replace(" dynModel=", ""))
         print("Model is:", str(model))
-       except:
-          print("Something Didn\'t work that time, I\'ll try again")
+        #except:
+        #  print("Something Didn\'t work that time, I\'ll try again")
       print("GPS Successfully in Flight Mode!!")
 
 
 #start_thread()
 #put_in_airborne_mode()
+gps_mode()
