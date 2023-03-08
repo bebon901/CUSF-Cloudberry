@@ -28,6 +28,7 @@ sensor = adafruit_lis2mdl.LIS2MDL(i2c)
 hardiron_calibration = [[-75.0, -10.2], [-17.7, 62.849999999999994], [27.9, 105.75]]
 # This will take the magnetometer values, adjust them with the calibrations
 # and return a new array with the XYZ values ranging from -100 to 100
+vals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 def normalize(_magvals):
     ret = [0, 0, 0]
     for i, axis in enumerate(_magvals):
@@ -40,13 +41,17 @@ def normalize(_magvals):
 while True:
     magvals = sensor.magnetic
     normvals = normalize(magvals)
-    print("magnetometer: %s -> %s" % (magvals, normvals))
+    #print("magnetometer: %s -> %s" % (magvals, normvals))
 
     # we will only use X and Y for the compass calculations, so hold it level!
     compass_heading = int(math.atan2(normvals[1], normvals[0]) * 180.0 / math.pi)
     # compass_heading is between -180 and +180 since atan2 returns -pi to +pi
     # this translates it to be between 0 and 360
     compass_heading += 180
-
-    print("Heading:", compass_heading)
+    vals.append(compass_heading)
+    vals.pop(0)
+    avg = 0
+    for i in range(len(vals)):
+        avg += (vals[i]/len(vals))
+    print("Heading:", avg)
     time.sleep(0.1)
